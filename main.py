@@ -9,7 +9,7 @@ from src.business.cadastro_funcionario import CadastroFuncionario
 # é bem de boa consultar/excluir por outro campo é só colocar o tipo como parametro --> teria que validar se o tipo escolhido é cpf ou matricula
 
 
-funcionario_teste = Funcionario('Teste', '01234567891', '2021-10-20', 20, 1)
+funcionario_teste = Funcionario('Teste', '56574567891', '2021-10-20', 20, 1)
 cadastro_teste = CadastroFuncionario()
 cadastro_teste.incluir(funcionario_teste)
 

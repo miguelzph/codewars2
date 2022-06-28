@@ -34,17 +34,18 @@ class CadastroFuncionario():
                 "comissao": funcionario.comissao
                 }
 
-        
         try:
-                self.database.query(query, params=params, commit=True)
+        
+          self.database.query(query, params=params, commit=True)
         except mysql.connector.IntegrityError as err:
             if err.errno == mysql.connector.errorcode.ER_BAD_NULL_ERROR:
                     print(f'Erro do tipo: {err}')
-        else:
+
+      else:
           raise DuplicateEntryError('CPF DUPLICADO!')
             
         
-        return None
+      return None
         
 
     def consultar_por_matricula(self, matricula: int):
