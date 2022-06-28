@@ -21,30 +21,31 @@ class CadastroFuncionario():
         
 
     def incluir(self, funcionario: Funcionario, commit=False) -> None:
-      if not self.verificar_existencia(campo='cpf', valor=funcionario.cpf):
-        query = ("INSERT INTO funcionarios" 
-              "(nome, cpf, data_admissao, cargo, comissao)"
-              "VALUES (%(nome)s, %(cpf)s, %(data_admissao)s, %(cargo)s, %(comissao)s)")
-            
-        params = {
-                "nome": funcionario.nome,
-                "cpf": funcionario.cpf,
-                "data_admissao": funcionario.data_admissao,
-                "cargo": funcionario.cargo,
-                "comissao": funcionario.comissao
-                }
-
-        try:
-        
-          self.database.query(query, params=params, commit=True)
-        except mysql.connector.IntegrityError as err:
-            if err.errno == mysql.connector.errorcode.ER_BAD_NULL_ERROR:
-                    print(f'Erro do tipo: {err}')
-
-      else:
-          raise DuplicateEntryError('CPF DUPLICADO!')
-            
-        
+      if  
+        if not self.verificar_existencia(campo='cpf', valor=funcionario.cpf):
+          query = ("INSERT INTO funcionarios" 
+                "(nome, cpf, data_admissao, cargo, comissao)"
+                "VALUES (%(nome)s, %(cpf)s, %(data_admissao)s, %(cargo)s, %(comissao)s)")
+              
+          params = {
+                  "nome": funcionario.nome,
+                  "cpf": funcionario.cpf,
+                  "data_admissao": funcionario.data_admissao,
+                  "cargo": funcionario.cargo,
+                  "comissao": funcionario.comissao
+                  }
+  
+          try:
+          
+            self.database.query(query, params=params, commit=True)
+          except mysql.connector.IntegrityError as err:
+              if err.errno == mysql.connector.errorcode.ER_BAD_NULL_ERROR:
+                      print(f'Erro do tipo: {err}')
+  
+        else:
+            raise DuplicateEntryError('CPF DUPLICADO!')
+              
+          
       return None
         
 
