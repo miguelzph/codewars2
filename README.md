@@ -10,6 +10,6 @@ Desenvolvido por:
 Obs: Estamos desenvolvendo o código utilizando o replit, e a integração com o github não é otimizada.
 
 ## Descrição
-Funcionalidades --> Desenvolvidas no Python
-Banco de Dados --> MySQL na AWS
-Interface --> Utilizado no Console do Python
+- Funcionalidades --> Desenvolvidas no Python
+- Banco de Dados --> MySQL na AWS
+- Interface --> Utilizado no Console do Python
