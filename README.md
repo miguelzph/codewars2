@@ -7,6 +7,9 @@ Desenvolvido por:
 - <a href="https://github.com/Tahpassos" title="Clique e acesse agora!" target="_blank">Tamara Passos</a>
 - <a href="https://github.com/VitorMath" title="Clique e acesse agora!" target="_blank">Vítor Mateus Brito</a>
 
-Obs: Estamos desenvolvendo o sistema utilizando o replit, e a integração com o github não é otimizada. Por isso há maior dificuldade em lidar com os commits
+Obs: Estamos desenvolvendo o código utilizando o replit, e a integração com o github não é otimizada.
 
 ## Descrição
+Funcionalidades --> Desenvolvidas no Python
+Banco de Dados --> MySQL na AWS
+Interface --> Utilizado no Console do Python
