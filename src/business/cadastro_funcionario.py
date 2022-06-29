@@ -41,7 +41,7 @@ class CadastroFuncionario():
                   }
   
                   
-          self.database.query(query, params=params, commit=True)
+          self.database.query(query, params=params, commit=commit)
           
   
         else:
@@ -54,35 +54,31 @@ class CadastroFuncionario():
     def consultar_por_matricula(self, matricula: int):
         
         if not self.verificar_existencia(valor=matricula):
-          raise FuncionarioNotFoundError('Funcionário não encontrado!')
+            raise FuncionarioNotFoundError('Funcionário não encontrado!')
         else:
             query = f"SELECT * FROM funcionarios WHERE matricula={matricula}"
             
             resultado_query = self.database.query(query)
-            
-            tupla_resultado = resultado_query['fetchall'][0]
-                
-            resultado = {'matricula': tupla_resultado[0],
-                        'nome':tupla_resultado[1] ,
-                        'cpf':tupla_resultado[2], 
-                        'data_admissao':tupla_resultado[3],
-                        'cargos':tupla_resultado[4],
-                        'comissao':tupla_resultado[5]}
+  
+            funcionario = resultado_query['fetchall'][0]
+  
+            nome_colunas =  [linha[0] for linha in resultado_query['description']]
         
+            resultado = dict(zip(nome_colunas, funcionario))
+                
         print(resultado)
 
         return resultado
         
 
-    def excluir_por_matricula(self, matricula):
+    def excluir_por_matricula(self, matricula, commit=False):
 
-        
         if not self.verificar_existencia(valor=matricula):
           raise FuncionarioNotFoundError('Funcionário não encontrado!')
         else:
             query = f"DELETE FROM funcionarios WHERE matricula={matricula}"
 
-            self.database.query(query)
+            self.database.query(query, commit=commit)
             
             print('Cadastro deletado!')
 
@@ -124,11 +120,9 @@ class CadastroFuncionario():
             WHERE matricula={matricula}"""
               
         params = {
-                  #"campo_de": campo_de,
-                  "valor_para": valor_para #,
-                 # "matricula": matricula
+                  "valor_para": valor_para
                   }
-        #query = f"""UPDATE funcionarios SET {campo_de}='{valor_para}' WHERE matricula={matricula}"""
+
             
         self.database.query(query,params=params, commit=True)
 
