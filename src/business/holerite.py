@@ -26,14 +26,14 @@ class Holerite():
           raise FuncionarioNotFoundError('Funcionário não encontrado!')
         else:
             query = f"""
-                SELECT matricula, nome, cpf, data_admissao, cargo, funcionarios.comissao, descricao,                              salario_base, cargos.comissao as 'comissao_percentual'
-                FROM 
-                	funcionarios
-                LEFT JOIN 
-                	cargos
-                ON 
-                	funcionarios.cargo = cargos.codigo
-                WHERE matricula={self.matricula}"""
+                SELECT matricula, nome, cpf, data_admissao, cargos_codigo, funcionarios.comissao, descricao, salario_base, cargos.comissao as 'comissao_percentual'
+FROM 
+	funcionarios
+LEFT JOIN 
+	cargos
+ON 
+	funcionarios.cargos_codigo = cargos.codigo
+WHERE matricula={self.matricula}"""
             resultado_query = self.database.query(query)
   
             funcionario = resultado_query['fetchall'][0]
@@ -98,10 +98,10 @@ class Holerite():
     def salvar_holerite(self):
 
         query = """INSERT INTO holerites
-      (salario_base, comissao, faltas, INSS, IRRF, desconto_faltas, FGTS, mes_referencia)
-      VALUES (%(salario_base)s, %(comissao)s, %(faltas)s, %(INSS)s, %(IRRF)s, %(desconto_faltas)s, %(FGTS)s, %(mes_referencia)s)"""
+      (salario_base, comissao, faltas, INSS, IRRF, desconto_faltas, FGTS, mes_referencia, funcionarios_matricula)
+      VALUES (%(salario_base)s, %(comissao)s, %(faltas)s, %(INSS)s, %(IRRF)s, %(desconto_faltas)s, %(FGTS)s, %(mes_referencia)s, %(funcionarios_matricula)s)"""
     
-        params = {
+        self.params = {
                 "salario_base": self.salario_base,
                 "comissao": self.valor_comissao,
                 "faltas": self.faltas,
@@ -109,14 +109,15 @@ class Holerite():
                 "INSS": self.inss_folha,
                 "IRRF":self.irrf_folha,
                 "FGTS": self.fgts_folha,
-                "mes_referencia": self.mes_referencia
+                "mes_referencia": self.mes_referencia,
+                "funcionarios_matricula":self.matricula
             }
-        self.database.query(query, params=params, commit=True)
+        self.database.query(query, params=self.params, commit=True)
 
         print('Holerite foi Salvo')
         return None
     
-    def gerar_holerite(self, faltas=0):
+    def gerar_holerite(self,faltas=0):
         self.faltas = faltas
      
         self.consultar_banco_dados()
@@ -128,11 +129,45 @@ class Holerite():
         self.preencher_fgts()
         self.preencher_desconto_por_falta()
         
-
+    
         self.salvar_holerite()
+
+        print(self.params)
 
         return None
 
 
+    def verificar_holerites_nao_gerados(self):
+        query = """Na tabela de holerites vai pegar todos que forem igual a mes_referencia e fazer um join com a de funcionarios, para verifica quais não tem o mes_referencia lançado ainda ( ainda precisa verificar a query quando a matricula for adicionada na holerite"""
 
+        """SELECT 
+	funcionarios.matricula
+FROM 
+	funcionarios
+LEFT JOIN (
+			SELECT  matricula, mes_referencia 
+			FROM holerites 
+			WHERE mes_referencia='2022-07' 
+		  ) AS temp_holorite
+ON 
+	funcionarios.matricula = temp_holorite.matricula
+WHERE
+	mes_referencia IS NULL"""
+
+        resultado_query = self.database.query(query)
+        # talvez alguma exception
+        tupla_matriculas = resultado_query['fetchall']
+
+        return tupla_matriculas
+
+    def gerar_holerites_pendentes(self):
+        matriculas = self.verificar_holerites_nao_gerados()
+        for matricula in matriculas:
+            self.matricula = matricula
+            self.gerar_holerite()
+
+        return None
+            
+
+        
 
