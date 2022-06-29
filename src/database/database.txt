@@ -1,0 +1,86 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema projeto_financeiro
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema projeto_financeiro
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `projeto_financeiro` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `projeto_financeiro` ;
+
+-- -----------------------------------------------------
+-- Table `projeto_financeiro`.`cargos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `projeto_financeiro`.`cargos` (
+  `codigo` INT NOT NULL,
+  `descricao` VARCHAR(45) NULL DEFAULT NULL,
+  `salario_base` FLOAT(10,2) NULL DEFAULT NULL,
+  `comissao` FLOAT(3,2) NULL DEFAULT NULL,
+  PRIMARY KEY (`codigo`),
+  UNIQUE INDEX `codigo_UNIQUE` (`codigo` ASC) VISIBLE)
+ENGINE = InnoDB
+AUTO_INCREMENT = 13
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `projeto_financeiro`.`funcionarios`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `projeto_financeiro`.`funcionarios` (
+  `matricula` INT(6) UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT,
+  `nome` VARCHAR(45) NOT NULL,
+  `CPF` VARCHAR(11) NOT NULL,
+  `data_admissao` DATE NOT NULL,
+  `comissao` ENUM('sim', 'nao') NOT NULL DEFAULT 'nao',
+  `cargos_codigo` INT NOT NULL,
+  PRIMARY KEY (`matricula`),
+  UNIQUE INDEX `CPF` (`CPF` ASC) VISIBLE,
+  INDEX `fk_funcionarios_cargos_idx` (`cargos_codigo` ASC) VISIBLE,
+  CONSTRAINT `fk_funcionarios_cargos`
+    FOREIGN KEY (`cargos_codigo`)
+    REFERENCES `projeto_financeiro`.`cargos` (`codigo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 2139
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `projeto_financeiro`.`holerites`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `projeto_financeiro`.`holerites` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `salario_base` FLOAT(10,2) NOT NULL,
+  `comissao` FLOAT(10,2) NOT NULL,
+  `faltas` INT NOT NULL,
+  `INSS` FLOAT(10,2) NOT NULL,
+  `IRRF` FLOAT(10,2) NOT NULL,
+  `desconto_faltas` FLOAT(10,2) NOT NULL,
+  `FGTS` FLOAT(10,2) NOT NULL,
+  `mes_referencia` VARCHAR(15) NOT NULL,
+  `funcionarios_matricula` INT(6) UNSIGNED ZEROFILL NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_holerites_funcionarios1_idx` (`funcionarios_matricula` ASC) VISIBLE,
+  CONSTRAINT `fk_holerites_funcionarios1`
+    FOREIGN KEY (`funcionarios_matricula`)
+    REFERENCES `projeto_financeiro`.`funcionarios` (`matricula`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+AUTO_INCREMENT = 7
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
