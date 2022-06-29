@@ -52,7 +52,7 @@ def menu_funcionario(cadastro):
         elif option == '4':
             try:
                 matricula = int(input('Digite a matricula: '))
-                campo = input('Qual campo será alterado?[nome, cpf, data_admissao, comissao, cargos_codigo]')
+                campo = input('Qual campo será alterado?[nome; cpf; data_admissao; comissao; cargos_codigo]')
                 novo_valor = input(f'Qual o novo valor do campo {campo}?')
                 cadastro.alterar_por_matricula(matricula, campo, novo_valor)
                 print('A informação foi alterada!')
@@ -81,28 +81,61 @@ def menu_funcionario(cadastro):
         
 
 
-def menu_holerite():
+def menu_holerite(database):
 
     while True:
 
         os.system('cls' if os.name == 'nt' else 'clear')
         
         option = input('''    -----MENU HOLERITES-----
-        [1]: Gerar Holerite
-        [2]: Gerar Holerites Pendentes
-    
-        [9]: Voltar ao Menu Inicial
-        [0]: Sair do sistema
-                       
-        Selecione uma opção:''')
-    
-        print('\n')
-    
-        return None
+    [1]: Gerar Holerite
+    [2]: Gerar Holerites Pendentes
 
+    [9]: Voltar ao Menu Inicial
+    [0]: Sair do sistema
+                   
+    Selecione uma opção:''')
+    
+        if option == '1':
+            try:
+                matricula = int(input('Digite a matricula do funcionario: '))
+                mes_referencia = input('Qual o mês de referência [ano-mes]? ')
+
+                holerite = Holerite(matricula, mes_referencia=mes_referencia, database=database)
+
+                qtd_faltas = int(input('Quantas faltas o funcionario possui? '))
+
+                holerite.gerar_holerite(faltas=qtd_faltas)
+                
+            except Exception as ex:
+                print(f'Entrada invalida: {ex}')
+        elif option == '2':
+            try:
+                mes_referencia = input('Qual o mês de referência [ano-mes]? ')
+
+                holerite = Holerite(0, mes_referencia=mes_referencia, database=database)
+
+                holerite.gerar_holerites_pendentes()
+                
+            except Exception as ex:
+                print(f'Entrada invalida: {ex}')
+            
+        elif option == '9':
+            return None
+        elif option == '0':
+            print('Saindo!')
+            exit()
+        else:
+            print('Opção invalida!')
+        
+        print('\n')
+        input('Aperte ENTER para voltar ao menu.')
+        print('\n')
 
 
 def main():
+
+    database = DB()
     
     cadastro = CadastroFuncionario()
     
@@ -122,7 +155,7 @@ def main():
         if option == '1':
             menu_funcionario(cadastro)
         elif option == '2':
-            menu_holerite()
+            menu_holerite(database)
         elif option == '0':
             print('Saindo!')
             exit()
