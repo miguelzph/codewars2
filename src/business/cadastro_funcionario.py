@@ -1,4 +1,3 @@
-import mysql.connector 
 from src.database.db import DB
 from src.entities.funcionario import Funcionario
 from src.exceptions.empty_table_error import EmptyTableError
@@ -18,35 +17,38 @@ class CadastroFuncionario():
         resultado_query = self.database.query(query)
         
         return resultado_query['fetchall'][0][0]
-        
 
+
+    def verifica_nulos(self, funcionario):
+        return all(funcionario.__dict__.values())
+        
+    
     def incluir(self, funcionario: Funcionario, commit=False) -> None:
-      if  
+      if not self.verifica_nulos(funcionario):  
+        raise NullDataError("Não é permitida a entrada de dados nulos ou vazios!")
+      else:
         if not self.verificar_existencia(campo='cpf', valor=funcionario.cpf):
           query = ("INSERT INTO funcionarios" 
-                "(nome, cpf, data_admissao, cargo, comissao)"
-                "VALUES (%(nome)s, %(cpf)s, %(data_admissao)s, %(cargo)s, %(comissao)s)")
+                "(nome, cpf, data_admissao, cargos_codigo, comissao)"
+                "VALUES (%(nome)s, %(cpf)s, %(data_admissao)s, %(cargos_codigo)s, %(comissao)s)")
               
           params = {
                   "nome": funcionario.nome,
                   "cpf": funcionario.cpf,
                   "data_admissao": funcionario.data_admissao,
-                  "cargo": funcionario.cargo,
+                  "cargos_codigo": funcionario.cargo,
                   "comissao": funcionario.comissao
                   }
   
-          try:
+                  
+          self.database.query(query, params=params, commit=True)
           
-            self.database.query(query, params=params, commit=True)
-          except mysql.connector.IntegrityError as err:
-              if err.errno == mysql.connector.errorcode.ER_BAD_NULL_ERROR:
-                      print(f'Erro do tipo: {err}')
   
         else:
-            raise DuplicateEntryError('CPF DUPLICADO!')
+          raise DuplicateEntryError('CPF DUPLICADO!')
               
           
-      return None
+      return print("Funcionário incluido")
         
 
     def consultar_por_matricula(self, matricula: int):
@@ -60,12 +62,11 @@ class CadastroFuncionario():
             
             tupla_resultado = resultado_query['fetchall'][0]
                 
-            # falta decidir se deve fazer join com a tabela de cargos
             resultado = {'matricula': tupla_resultado[0],
                         'nome':tupla_resultado[1] ,
                         'cpf':tupla_resultado[2], 
                         'data_admissao':tupla_resultado[3],
-                        'cargo':tupla_resultado[4],
+                        'cargos':tupla_resultado[4],
                         'comissao':tupla_resultado[5]}
         
         print(resultado)
@@ -80,7 +81,9 @@ class CadastroFuncionario():
           raise FuncionarioNotFoundError('Funcionário não encontrado!')
         else:
             query = f"DELETE FROM funcionarios WHERE matricula={matricula}"
-            resultado_query = self.database.query(query, commit=True)
+
+            self.database.query(query)
+            
             print('Cadastro deletado!')
 
             return True
@@ -106,5 +109,28 @@ class CadastroFuncionario():
             return lista_funcionarios
 
   
-    def alterar_por_matricula(self, matricula):
-        pass
+    def alterar_por_matricula(self, matricula, campo_de, valor_para):
+         
+        if not self.verificar_existencia(valor=matricula):
+          raise FuncionarioNotFoundError('Funcionário não encontrado!') 
+        if valor_para == None or valor_para == '':
+            raise NullDataError("Não é permitida a entrada de dados nulos ou vazios!")
+        if campo_de not in ['nome', 'cpf', 'data_admissao', 'cargos_codigo', 'comissao']:
+            pass# field not exist
+            print('A coluna não existe na tabela')
+        
+        query = f"""
+            UPDATE funcionarios SET {campo_de} = (%(valor_para)s)
+            WHERE matricula={matricula}"""
+              
+        params = {
+                  #"campo_de": campo_de,
+                  "valor_para": valor_para #,
+                 # "matricula": matricula
+                  }
+        #query = f"""UPDATE funcionarios SET {campo_de}='{valor_para}' WHERE matricula={matricula}"""
+            
+        self.database.query(query,params=params, commit=True)
+
+        return True
+        
