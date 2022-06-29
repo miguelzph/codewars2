@@ -1,6 +1,7 @@
 from src.business.inss import calcula_inss
 from src.business.irrf import calcula_irrf
 from src.exceptions.funcionario_not_found_error import FuncionarioNotFoundError
+from src.exceptions.duplicate_entry_error import DuplicateEntryError
 
 
 class Holerite():
@@ -118,47 +119,54 @@ WHERE matricula={self.matricula}"""
         return None
     
     def gerar_holerite(self,faltas=0):
-        self.faltas = faltas
-     
-        self.consultar_banco_dados()
-        self.transformar_dados_em_atributos()
-        
-        self.preencher_valor_comissao()
-        self.preencher_inss()
-        self.preencher_irrf()
-        self.preencher_fgts()
-        self.preencher_desconto_por_falta()
-        
+
+        if self.matricula not in self.verificar_holerites_nao_gerados():
+            raise DuplicateEntryError('Holerite do funcionário já existe')
+        else:
+            self.faltas = faltas
+            
+            self.consultar_banco_dados()
+            self.transformar_dados_em_atributos()
+            
+            self.preencher_valor_comissao()
+            self.preencher_inss()
+            self.preencher_irrf()
+            self.preencher_fgts()
+            self.preencher_desconto_por_falta()
     
-        self.salvar_holerite()
-
-        print(self.params)
-
-        return None
+            
+            self.salvar_holerite()
+    
+            print(self.params)
+    
+            return None
 
 
     def verificar_holerites_nao_gerados(self):
-        query = """Na tabela de holerites vai pegar todos que forem igual a mes_referencia e fazer um join com a de funcionarios, para verifica quais não tem o mes_referencia lançado ainda ( ainda precisa verificar a query quando a matricula for adicionada na holerite"""
-
-        """SELECT 
+        query = f"""SELECT 
 	funcionarios.matricula
 FROM 
 	funcionarios
 LEFT JOIN (
-			SELECT  matricula, mes_referencia 
+			SELECT  funcionarios_matricula, mes_referencia 
 			FROM holerites 
-			WHERE mes_referencia='2022-07' 
+			WHERE mes_referencia= %(mes_referencia)s
 		  ) AS temp_holorite
 ON 
-	funcionarios.matricula = temp_holorite.matricula
-WHERE
+	funcionarios.matricula = temp_holorite.funcionarios_matricula
+WHERE 
 	mes_referencia IS NULL"""
 
-        resultado_query = self.database.query(query)
-        # talvez alguma exception
-        tupla_matriculas = resultado_query['fetchall']
+        params = {'mes_referencia': self.mes_referencia}
 
-        return tupla_matriculas
+        resultado_query = self.database.query(query, params=params)
+        # talvez alguma exception
+        lista_resultados = resultado_query['fetchall']
+
+        matriculas_nao_geradas = [valor[0] for valor in lista_resultados]
+
+        return matriculas_nao_geradas
+
 
     def gerar_holerites_pendentes(self):
         matriculas = self.verificar_holerites_nao_gerados()
