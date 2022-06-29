@@ -4,27 +4,27 @@
       {
         "id": "8ebb0dce-2b2c-4fd5-b8ef-9aee101d9e26",
         "line": 9,
-        "version": 3945,
-        "index": 412
+        "version": 4211,
+        "index": 417
       }
     ],
     "src/business/cadastro_funcionario.py": [
       {
         "id": "e2ebd9b2-e0d2-4b0c-965c-305200bf124f",
         "line": 26,
-        "version": 3955,
+        "version": 4053,
         "index": 900
       },
       {
         "id": "e989574b-8d53-4de9-a760-270907206dc5",
         "line": 32,
-        "version": 3955,
+        "version": 4053,
         "index": 1178
       },
       {
         "id": "14851817-ec1b-404f-9e74-ec8069fb0894",
         "line": 32,
-        "version": 3955,
+        "version": 4053,
         "index": 1178
       }
     ]
